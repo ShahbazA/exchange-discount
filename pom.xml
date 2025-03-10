@@ -13,9 +13,6 @@
 	<version>1.0.0</version>
 	<name>exchange-discount</name>
 
-	<properties>
-		<java.version>17</java.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.ehcache</groupId>
