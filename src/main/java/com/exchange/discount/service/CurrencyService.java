@@ -23,7 +23,7 @@ public class CurrencyService {
         this.webClient = WebClient.create();
     }
 
-    @Cacheable(cacheNames = "exchangeRatesCache", key = "#originalCurrency")
+    @Cacheable(cacheNames = "exchangeRatesCache", key = "#originalCurrency + '_' + #targetCurrency")
     public Double currencyConversion(String originalCurrency, String targetCurrency){
         String jsonPath = "$.rates." + targetCurrency;
 

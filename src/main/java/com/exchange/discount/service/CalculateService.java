@@ -14,26 +14,41 @@ public class CalculateService {
     private CurrencyService currencyService;
 
     public Double calculate(Bill bill) {
-        log.info("Bill: {}", bill);
+        String originalCurrency = bill.getOriginalCurrency();
+        String targetCurrency = bill.getTargetCurrency();
 
         Double totalAmountPayable = discountToApply(bill);
-        double usdRate = currencyService.currencyConversion(bill.getOriginalCurrency(), "USD");
+        log.info("Total amount after applying discount: {} {}", totalAmountPayable, originalCurrency);
 
-        double payableAmountInUsd = (totalAmountPayable/usdRate);
+        double usdRate = currencyService.currencyConversion(bill.getOriginalCurrency(), "USD");
+        log.info("USD rate: {}", usdRate);
+
+        double payableAmountInUsd = totalAmountPayable * usdRate;
+        log.info("Total amount converted to USD: {}", payableAmountInUsd);
 
         payableAmountInUsd = fiveDollarDiscount(payableAmountInUsd);
+        log.info("Total amount after $5 discount: {}", payableAmountInUsd);
 
-        double usdRateOriginal = currencyService.currencyConversion("USD", bill.getTargetCurrency());
+        double usdRateOriginal = currencyService.currencyConversion("USD", targetCurrency);
+        log.info("USD to {} rate: {}", targetCurrency , usdRateOriginal);
 
         double payableAmountOriginal = payableAmountInUsd * usdRateOriginal;
+        log.info("Payable amount after conversion to {} : {}", targetCurrency, payableAmountOriginal);
 
-        return roundOff(payableAmountOriginal);
+        double finalPayableAmount = roundOff(payableAmountOriginal);
+        log.info("Final payable amount after all discounts: {}", finalPayableAmount);
+
+        return finalPayableAmount;
     }
 
     public Double fiveDollarDiscount(Double payableAmountInUsd){
-        int discountMultiplier = (int) (payableAmountInUsd / 100); // Number of times 100 fits into the value
+        int discountMultiplier = (int) (payableAmountInUsd / 100);
         double discount = discountMultiplier * 5;
-
+        if(discount > 0.0){
+            log.info("Bill is greater than $100, applying discount for ${}", discount);
+        }else{
+            log.info("Bill is less than $100, discount not applied");
+        }
         return payableAmountInUsd - discount;
     }
 
